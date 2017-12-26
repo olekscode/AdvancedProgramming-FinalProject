@@ -9,6 +9,7 @@ import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,17 +24,20 @@ public class DataService {
     @Autowired
     private SQLContext sqlContext;
 
-    @Autowired
+    @Value("data/rawData.txt")
     private String pathToData;
 
     @Autowired
     private Config config;
 
+    @Autowired
+    private RowParser rowParser;
+
     public DataFrame readData() {
         JavaRDD<String> rdd = sc.textFile(pathToData);
         rdd = rdd.filter(line->!line.isEmpty()); // filtering empty rows
 
-        JavaRDD<Row> rowRdd = rdd.map(this::createRowFromLine);
+        JavaRDD<Row> rowRdd = rdd.map(rowParser::parse);
         List<String> columnNames = config.getColumnNames();
 
         StructField[] fields = new StructField[columnNames.size()];

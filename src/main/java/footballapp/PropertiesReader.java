@@ -4,15 +4,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public abstract class PropertiesReader {
-    protected abstract String getPropertiesFileName();
+public class PropertiesReader {
+    public Properties readProperties(String propertiesFileName) {
+        Properties props = new Properties();
 
-    public Properties getProperties() throws IOException {
-        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        String appConfigPath = rootPath + "app.properties";
+        try {
+            props.load(new FileInputStream(propertiesFileName));
+        }
+        catch (Exception error) {
+            System.out.println(error);
+        }
 
-        Properties appProps = new Properties();
-        appProps.load(new FileInputStream(appConfigPath));
-        return appProps;
+        return props;
     }
+
+
 }
